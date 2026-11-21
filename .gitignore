@@ -1,0 +1,6 @@
+data/runtime/
+*.exe
+/gdr
+/tmp/
+.DS_Store
+*.log

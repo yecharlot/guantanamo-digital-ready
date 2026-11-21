@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guantánamo Digital Ready · GDR</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">GDR</div>
+        <div>
+          <h1>Guantánamo Digital Ready</h1>
+          <p>Resolución 24/2026</p>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="diagnostico">Diagnóstico</button>
+        <button class="nav-item" data-view="inventario">Inventario de Datos</button>
+        <button class="nav-item" data-view="expediente">Expediente</button>
+        <button class="nav-item" data-view="estrategia">Estrategia</button>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="badge offline">Offline-first</span>
+        <span class="badge">MVP 1.0</span>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="topbar">
+        <h2 id="view-title">Dashboard</h2>
+        <div class="entity-box">
+          <input id="entity-name" type="text" placeholder="Nombre de la entidad (ej. Gobierno Municipal de Guantánamo)" value="Gobierno Municipal de Guantánamo" />
+        </div>
+      </header>
+
+      <!-- Dashboard -->
+      <section id="view-dashboard" class="view active">
+        <div class="cards">
+          <div class="card gradient-1">
+            <h3>Madurez Digital</h3>
+            <div class="big-number" id="dash-puntaje">—</div>
+            <p id="dash-nivel">Sin evaluación</p>
+          </div>
+          <div class="card gradient-2">
+            <h3>Conjuntos de Datos</h3>
+            <div class="big-number" id="dash-datos">0</div>
+            <p>Inventariados</p>
+          </div>
+          <div class="card gradient-3">
+            <h3>Expediente</h3>
+            <div class="big-number" id="dash-exp">—</div>
+            <p>Estado</p>
+          </div>
+          <div class="card gradient-4">
+            <h3>Recomendaciones</h3>
+            <div class="big-number" id="dash-recs">0</div>
+            <p>Priorizadas</p>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="radarChart"></canvas>
+        </div>
+        <p class="principle">« Primero los datos, la IA después » — Resolución 24/2026</p>
+      </section>
+
+      <!-- Diagnóstico -->
+      <section id="view-diagnostico" class="view">
+        <div class="panel">
+          <h3>Diagnóstico de Madurez Digital</h3>
+          <p class="hint">Evalúe cada dimensión de 0 (inexistente) a 5 (óptimo) según la metodología de la Resolución 24/2026.</p>
+          <div id="dimensiones-form"></div>
+          <button class="btn primary" id="btn-evaluar">Calcular madurez</button>
+          <div id="resultado-diagnostico" class="result-box hidden"></div>
+        </div>
+      </section>
+
+      <!-- Inventario -->
+      <section id="view-inventario" class="view">
+        <div class="panel">
+          <h3>Inventario de Datos</h3>
+          <p class="hint">Registre los principales conjuntos de datos de la entidad. Este paso es obligatorio antes de generar la estrategia de IA.</p>
+          <div class="form-row">
+            <input id="dato-nombre" placeholder="Nombre del conjunto de datos" />
+            <select id="dato-sensibilidad">
+              <option value="publica">Pública</option>
+              <option value="interna">Interna</option>
+              <option value="restringida">Restringida</option>
+              <option value="datos_personales">Datos personales</option>
+            </select>
+            <select id="dato-calidad">
+              <option value="desconocida">Calidad desconocida</option>
+              <option value="baja">Baja</option>
+              <option value="media">Media</option>
+              <option value="alta">Alta</option>
+            </select>
+            <button class="btn" id="btn-add-dato">Añadir</button>
+          </div>
+          <ul id="lista-datos" class="lista"></ul>
+          <button class="btn primary" id="btn-guardar-inventario">Guardar inventario</button>
+        </div>
+      </section>
+
+      <!-- Expediente -->
+      <section id="view-expediente" class="view">
+        <div class="panel">
+          <h3>Expediente Digital de Arranque</h3>
+          <p class="hint">Genera el documento exigido por la Resolución 24/2026 a partir del diagnóstico e inventario.</p>
+          <button class="btn primary" id="btn-generar-expediente">Generar Expediente</button>
+          <div id="expediente-preview" class="result-box hidden"></div>
+        </div>
+      </section>
+
+      <!-- Estrategia -->
+      <section id="view-estrategia" class="view">
+        <div class="panel">
+          <h3>Estrategia de Transformación Digital e IA</h3>
+          <p class="hint">Roadmap priorizado para el Horizonte 2026-2027 (capacidades habilitadoras).</p>
+          <button class="btn primary" id="btn-generar-estrategia">Generar Roadmap</button>
+          <div id="estrategia-preview" class="result-box hidden"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="/js/app.js"></script>
+</body>
+</html>
