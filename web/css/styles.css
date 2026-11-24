@@ -350,3 +350,151 @@ nav {
   .app { grid-template-columns: 1fr; }
   .sidebar { padding: 1rem; }
 }
+
+/* ——— Guía de puntuación por dimensión ——— */
+.dim-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+.dim-card-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.65rem;
+}
+.dim-num {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0ea5e9, #0369a1);
+  color: #fff;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+.dim-card-head h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+.dim-pregunta {
+  margin: 0;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.dim-details {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #e2e8f0;
+}
+.dim-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #0369a1;
+  font-size: 0.9rem;
+}
+.dim-guide {
+  margin-top: 0.65rem;
+  font-size: 0.88rem;
+  color: #334155;
+  line-height: 1.45;
+}
+.crit-label {
+  font-weight: 700;
+  color: #0f172a;
+}
+.niveles-grid {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.nivel-criterio {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.84rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.nivel-criterio.is-selected {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+  background: #f0f9ff;
+}
+.nivel-criterio-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+}
+.nivel-badge {
+  display: inline-flex;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+  background: #64748b;
+}
+.nivel-badge.n0 { background: #64748b; }
+.nivel-badge.n1 { background: #dc2626; }
+.nivel-badge.n2 { background: #ea580c; }
+.nivel-badge.n3 { background: #ca8a04; }
+.nivel-badge.n4 { background: #16a34a; }
+.nivel-badge.n5 { background: #047857; }
+.dim-score-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin: 0.5rem 0;
+}
+.dim-score-row label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.dim-select {
+  min-width: 11rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+}
+.dim-score-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.85rem;
+  color: #0369a1;
+  background: #e0f2fe;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+.dim-evidencia-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  margin-top: 0.35rem;
+}
+.dim-evidencia {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.9rem;
+  resize: vertical;
+  font-family: inherit;
+}

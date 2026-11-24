@@ -32,6 +32,7 @@ func (s *Server) routes() {
 	s.Mux.HandleFunc("/api/health", s.handleHealth)
 	s.Mux.HandleFunc("/api/diagnostico", s.handleDiagnostico)
 	s.Mux.HandleFunc("/api/diagnostico/evaluar", s.handleEvaluar)
+	s.Mux.HandleFunc("/api/diagnostico/criterios", s.handleCriterios)
 	s.Mux.HandleFunc("/api/inventario", s.handleInventario)
 	s.Mux.HandleFunc("/api/expediente", s.handleExpediente)
 	s.Mux.HandleFunc("/api/estrategia", s.handleEstrategia)

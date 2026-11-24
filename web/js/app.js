@@ -12,63 +12,229 @@ const state = {
   respuestas: {}
 };
 
-const dimensiones = [
-  "Gobernanza y liderazgo digital",
-  "Infraestructura tecnológica",
-  "Disponibilidad y calidad de datos",
-  "Seguridad informática y ciberseguridad",
-  "Procesos de trabajo digitalizados",
-  "Servicios al ciudadano",
-  "Capacidades del personal",
-  "Marco normativo y cumplimiento",
-  "Interoperabilidad",
-  "Preparación para IA (Pirámide Funcional)"
+
+/* Guías detalladas por dimensión y nivel (alineadas a internal/organism/diagnostico/criterios.go) */
+const GUIAS = [
+  {
+    nombre: "Gobernanza y liderazgo digital",
+    pregunta_guia: "¿Existe dirección formal, roles y decisiones sobre transformación digital en la entidad?",
+    por_que_importa: "Sin liderazgo y gobernanza, los proyectos digitales se fragmentan, no se priorizan ni se sostiene el cambio.",
+    como_evaluar: "Revise organigramas, actas, designaciones de CTO/CDTO o equivalentes, planes aprobados y evidencias de seguimiento por la dirección.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"No hay ninguna instancia, rol ni decisión formal sobre digitalización.", ejemplos:"Nadie es responsable; no aparece en planes institucionales.", evidencia_sugerida:"Ausencia de documentos o designaciones."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Hay interés o iniciativas aisladas de personas, sin mandato formal.", ejemplos:"Un jefe de informática impulsa mejoras por cuenta propia; menciones verbales en reuniones.", evidencia_sugerida:"Correos o notas informales; sin resolución/acta."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Existe un responsable designado o un grupo informal con algún plan escrito limitado.", ejemplos:"Designación por escrito del responsable TIC; plan anual breve sin presupuesto claro.", evidencia_sugerida:"Resolución de designación; borrador de plan."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Hay estructura de gobernanza activa (comité o equivalente) y plan alineado a objetivos de la entidad.", ejemplos:"Comité de transformación digital que se reúne; plan con metas y responsables.", evidencia_sugerida:"Actas de comité; plan aprobado; indicadores."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"La dirección usa indicadores digitales en la gestión y hay políticas de datos/TIC aplicadas.", ejemplos:"Tablero de seguimiento en consejos de dirección; política de datos firmada y comunicada.", evidencia_sugerida:"Informes periódicos a dirección; políticas vigentes."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Gobernanza madura, transversal, con mejora continua y rendición de cuentas pública o institucional.", ejemplos:"Estrategia digital institucional integrada al plan de desarrollo; auditoría de cumplimiento.", evidencia_sugerida:"Estrategia publicada; evaluación externa o autoevaluación formal."}
+    ]
+  },
+  {
+    nombre: "Infraestructura tecnológica",
+    pregunta_guia: "¿Qué capacidad real tienen equipos, redes, servidores y continuidad de servicio?",
+    por_que_importa: "La infraestructura es la base física/lógica; sin ella no hay servicios estables ni datos confiables.",
+    como_evaluar: "Inventario de equipos, conectividad, centros de datos o hosting, respaldos y tiempos de indisponibilidad conocidos.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"Casi no hay equipos útiles o la entidad depende totalmente de medios ajenos no controlados.", ejemplos:"Puestos sin PC; sin red institucional.", evidencia_sugerida:"Inventario vacío o equipos fuera de servicio."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Equipos obsoletos o insuficientes; conectividad intermitente; sin estándares.", ejemplos:"PCs compartidos; Internet solo en una oficina.", evidencia_sugerida:"Listado informal de equipos."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Hay PCs y red local básica en áreas prioritarias; sin alta disponibilidad.", ejemplos:"LAN en sede principal; impresora compartida; antivirus puntual.", evidencia_sugerida:"Inventario básico; diagrama simple de red."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Infraestructura documentada, con respaldos regulares y soporte definido.", ejemplos:"Servidor de archivos; backups semanales; contrato o equipo de soporte.", evidencia_sugerida:"Política de backup; tickets de soporte."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"Monitoreo, segmentación razonable, continuidad planificada y actualización controlada.", ejemplos:"Monitoreo de red; UPS; plan de continuidad; ventanas de mantenimiento.", evidencia_sugerida:"Informes de monitoreo; plan DR/BCP resumido."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Arquitectura resiliente, escalable, con métricas de disponibilidad y mejora continua.", ejemplos:"Alta disponibilidad en servicios críticos; métricas SLA internas cumplidas.", evidencia_sugerida:"SLA; reportes de disponibilidad; auditorías técnicas."}
+    ]
+  },
+  {
+    nombre: "Disponibilidad y calidad de datos",
+    pregunta_guia: "¿Los datos institucionales están identificados, accesibles, actualizados y con calidad conocida?",
+    por_que_importa: "La Resolución prioriza «primero los datos»; sin datos de calidad no hay IA ni decisiones confiables.",
+    como_evaluar: "Catálogo de conjuntos de datos, dueños, frecuencia de actualización, errores conocidos y medios de acceso.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"No se sabe qué datos existen ni dónde están.", ejemplos:"Información solo en papel disperso o en personas.", evidencia_sugerida:"Sin inventario de datos."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Datos en archivos aislados (Excel, USB) sin dueño claro ni control de versiones.", ejemplos:"Cada área tiene sus hojas de cálculo distintas.", evidencia_sugerida:"Muestras de archivos sin estándar."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Algunos conjuntos prioritarios identificados; calidad desigual; poco documentados.", ejemplos:"Padrones parciales; bases Access locales.", evidencia_sugerida:"Lista inicial de conjuntos de datos."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Catálogo básico con responsables; reglas mínimas de actualización y validación.", ejemplos:"Diccionario de datos parcial; controles de duplicados en sistemas clave.", evidencia_sugerida:"Catálogo; responsables asignados."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"Calidad medida (completitud, exactitud); datos maestros definidos; acceso controlado.", ejemplos:"Indicadores de calidad; proceso de depuración periódico.", evidencia_sugerida:"Informes de calidad; políticas de datos maestros."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Gobernanza de datos madura, trazabilidad del ciclo de vida y datos listos para analítica/IA.", ejemplos:"Lineaje de datos; datasets certificados para uso analítico.", evidencia_sugerida:"Marco de gobernanza de datos; certificaciones internas."}
+    ]
+  },
+  {
+    nombre: "Seguridad informática y ciberseguridad",
+    pregunta_guia: "¿Cómo se protegen sistemas, datos y usuarios ante incidentes y amenazas?",
+    por_que_importa: "La digitalización sin seguridad expone datos de ciudadanos y la continuidad del servicio público.",
+    como_evaluar: "Controles de acceso, respaldos, actualizaciones, sensibilización, gestión de incidentes y cumplimiento básico.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"Sin controles básicos; contraseñas compartidas o ausentes; sin conciencia del riesgo.", ejemplos:"Equipos sin usuario/contraseña; USB libre sin control.", evidencia_sugerida:"Hallazgos evidentes de ausencia de controles."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Medidas ad hoc (un antivirus, alguna contraseña) sin política.", ejemplos:"Antivirus en algunos PCs; WiFi con clave compartida antigua.", evidencia_sugerida:"Instalaciones puntuales."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Controles mínimos documentados: cuentas por usuario, antivirus institucional, respaldos ocasionales.", ejemplos:"Política breve de contraseñas; backups mensuales.", evidencia_sugerida:"Documento de normas básicas."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Gestión de accesos, actualizaciones regulares, canales de reporte de incidentes.", ejemplos:"Altas/bajas de usuarios; parches; registro de incidentes.", evidencia_sugerida:"Procedimiento de incidentes; registros."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"Enfoque preventivo: clasificación de información, pruebas, formación periódica.", ejemplos:"Clasificación de datos; simulacros; capacitación anual.", evidencia_sugerida:"Plan de seguridad; evidencias de formación."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Sistema de gestión de seguridad alineado a buenas prácticas, con mejora continua y auditoría.", ejemplos:"SGSI o equivalente adaptado; auditorías y tratamiento de riesgos.", evidencia_sugerida:"Informes de auditoría; matriz de riesgos actualizada."}
+    ]
+  },
+  {
+    nombre: "Procesos de trabajo digitalizados",
+    pregunta_guia: "¿Qué proporción de los procesos prioritarios se ejecuta y registra en medios digitales?",
+    por_que_importa: "Digitalizar procesos reduce tiempos, errores y habilita datos operativos reales.",
+    como_evaluar: "Mapee procesos clave (trámites, control interno, logística) y vea si hay sistema, plantillas o solo papel.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"Casi todo es papel o oral; no hay flujos digitales.", ejemplos:"Expedientes solo físicos; colas sin turno digital.", evidencia_sugerida:"Observación de operación 100% manual."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Uso esporádico de ofimática; procesos siguen siendo manuales.", ejemplos:"Se imprime todo lo que se escribe en Word.", evidencia_sugerida:"Plantillas sueltas sin flujo."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Algunos procesos parciales en sistemas o formularios digitales, con retrabajo a papel.", ejemplos:"Registro digital que luego se imprime y firma en papel.", evidencia_sugerida:"Capturas de pantallas de sistemas parciales."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Procesos prioritarios mayormente digitales, con reglas claras de operación.", ejemplos:"Trámite interno en sistema de workflow; menos papel.", evidencia_sugerida:"Mapa de procesos; sistema en producción."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"Automatizaciones, integraciones entre áreas y medición de tiempos/calidad del proceso.", ejemplos:"Alertas automáticas; tableros de tiempos de trámite.", evidencia_sugerida:"KPI de procesos; integraciones documentadas."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Procesos optimizados de punta a punta, medidos y en mejora continua basada en datos.", ejemplos:"Rediseño continuo; eliminación de pasos sin valor.", evidencia_sugerida:"Ciclo de mejora documentado; resultados medibles."}
+    ]
+  },
+  {
+    nombre: "Servicios al ciudadano",
+    pregunta_guia: "¿Cómo interactúa el ciudadano/usuario con la entidad por canales digitales?",
+    por_que_importa: "La transformación digital pública se valida en la experiencia real del ciudadano.",
+    como_evaluar: "Presencia web/app, trámites en línea, citas, información actualizada, accesibilidad y soporte.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"Sin canal digital útil; solo presencial o teléfono informal.", ejemplos:"Sin sitio web o sitio abandonado años.", evidencia_sugerida:"Verificación de ausencia de canales."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Información estática mínima en web o redes, sin trámites.", ejemplos:"Página con dirección y teléfono desactualizados.", evidencia_sugerida:"Captura del sitio."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Información actualizada y algún formulario o descarga de modelos.", ejemplos:"PDF de requisitos; formulario de contacto.", evidencia_sugerida:"Formularios publicados."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Trámites o solicitudes digitales con seguimiento básico.", ejemplos:"Cita en línea; estado de solicitud por código.", evidencia_sugerida:"Sistema de trámites en uso."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"Servicios transaccionales integrados, con identidad del usuario y métricas de uso.", ejemplos:"Pagos o validaciones en línea según marco legal; panel de uso.", evidencia_sugerida:"Estadísticas de uso; integración con backends."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Experiencia omnicanal, accesible, con mejora continua basada en satisfacción y datos.", ejemplos:"Múltiples canales coherentes; encuestas; ajustes frecuentes.", evidencia_sugerida:"Medición de satisfacción; roadmap de servicio."}
+    ]
+  },
+  {
+    nombre: "Capacidades del personal",
+    pregunta_guia: "¿El personal tiene competencias digitales y de datos acordes a su rol?",
+    por_que_importa: "La tecnología sin personas capacitadas no se adopta ni se sostiene.",
+    como_evaluar: "Planes de formación, nivel de uso real de herramientas, perfiles TIC y cultura de aprendizaje.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"Personal sin habilidades digitales básicas para el puesto.", ejemplos:"Dependencia total de una sola persona para cualquier tarea en PC.", evidencia_sugerida:"Observación / entrevistas."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Uso básico autodidacta; sin plan de formación.", ejemplos:"Algunos usan WhatsApp o Word a nivel elemental.", evidencia_sugerida:"Sin plan de capacitación."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Capacitaciones puntuales; usuarios operan sistemas prioritarios con apoyo.", ejemplos:"Curso ocasional; manuales internos breves.", evidencia_sugerida:"Registros de asistencia a cursos."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Plan de formación digital por roles; competencias definidas.", ejemplos:"Rutas de aprendizaje; evaluación básica de competencias.", evidencia_sugerida:"Plan anual de capacitación."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"Competencias de datos/TIC extendidas; multiplicadores internos; actualización continua.", ejemplos:"Referentes digitales por área; comunidades de práctica.", evidencia_sugerida:"Evidencias de formación continua."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Cultura de aprendizaje digital consolidada; atracción y retención de talento especializado.", ejemplos:"Perfiles de datos/IA o avanzados TIC; carrera profesional.", evidencia_sugerida:"Política de talento digital; indicadores de clima/retención."}
+    ]
+  },
+  {
+    nombre: "Marco normativo y cumplimiento",
+    pregunta_guia: "¿La entidad aplica y documenta el marco legal y normativo digital y de datos aplicable?",
+    por_que_importa: "La legitimidad y la protección de derechos dependen del cumplimiento normativo.",
+    como_evaluar: "Políticas internas, registros exigidos, protección de datos personales, alineación a resoluciones ministeriales.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"Desconocimiento o incumplimiento evidente de normas digitales/datos aplicables.", ejemplos:"Sin políticas; datos personales sin control.", evidencia_sugerida:"Hallazgos de incumplimiento."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Conocimiento parcial; aplicación inconsistente.", ejemplos:"Se conoce la norma pero no hay procedimientos.", evidencia_sugerida:"Entrevistas; ausencia de procedimientos."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Algunas políticas o procedimientos escritos alineados a normas prioritarias.", ejemplos:"Política interna breve de uso de TIC o de datos.", evidencia_sugerida:"Documento aprobado."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Cumplimiento sistemático de obligaciones principales con responsables claros.", ejemplos:"Registros, consentimientos o controles según marco aplicable.", evidencia_sugerida:"Evidencias de cumplimiento rutinario."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"Seguimiento proactivo de cambios normativos y ajustes oportunos.", ejemplos:"Revisión periódica del marco; checklist de cumplimiento.", evidencia_sugerida:"Actas de revisión normativa."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Cultura de cumplimiento, auditoría interna y mejora ante hallazgos.", ejemplos:"Auditorías; planes correctivos cerrados a tiempo.", evidencia_sugerida:"Informes de auditoría y seguimiento."}
+    ]
+  },
+  {
+    nombre: "Interoperabilidad",
+    pregunta_guia: "¿Los sistemas y áreas intercambian datos de forma acordada, segura y reutilizable?",
+    por_que_importa: "Sin interoperabilidad se duplican esfuerzos y se fragmenta la visión del ciudadano y de la gestión.",
+    como_evaluar: "Interfaces, estándares, convenios de intercambio, silos conocidos y reutilización de datos entre sistemas.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"Sistemas y áreas totalmente aislados; intercambio solo por papel o USB informal.", ejemplos:"Cada sistema es un silo; reescritura manual de datos.", evidencia_sugerida:"Arquitectura de sistemas sin enlaces."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Intercambios esporádicos manuales o archivos enviados por correo.", ejemplos:"Exportar CSV y reimportar a mano.", evidencia_sugerida:"Ejemplos de archivos intercambiados."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Algunas interfaces puntuales o bases compartidas limitadas entre sistemas propios.", ejemplos:"Dos sistemas de la entidad comparten una tabla o carpeta controlada.", evidencia_sugerida:"Descripción de la interfaz puntual."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Estándares internos de intercambio; convenios con al menos un actor externo o sistema nacional/sectorial.", ejemplos:"API o formato acordado; convenio de intercambio.", evidencia_sugerida:"Documento de interfaz; convenio."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"Interoperabilidad planificada en la arquitectura; reutilización sistemática de datos.", ejemplos:"Catálogo de servicios de datos; menos duplicación.", evidencia_sugerida:"Mapa de integraciones."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Ecosistema interoperable medido, seguro y alineado a marcos nacionales/sectoriales de intercambio.", ejemplos:"Participación estable en plataformas de interoperabilidad; monitoreo de intercambios.", evidencia_sugerida:"Métricas de intercambio; certificaciones o adhesiones formales."}
+    ]
+  },
+  {
+    nombre: "Preparación para IA (Pirámide Funcional)",
+    pregunta_guia: "¿Están sentadas las bases (datos, procesos, ética, casos de uso) antes de adoptar IA?",
+    por_que_importa: "La Resolución insiste en no saltar a IA sin datos y capacidades previas; evita proyectos fallidos.",
+    como_evaluar: "Madurez de datos y procesos previos, casos de uso priorizados, riesgos éticos y capacidad de evaluar proveedores/modelos.",
+    niveles: [
+      {nivel:0, etiqueta:"Inexistente", cuando_elegir:"No hay bases de datos/procesos; se habla de IA solo como moda, sin casos reales.", ejemplos:"Propuestas de IA sin inventario de datos ni problema claro.", evidencia_sugerida:"Ausencia de casos de uso documentados."},
+      {nivel:1, etiqueta:"Inicial", cuando_elegir:"Interés exploratorio; experimentos personales sin gobierno ni datos preparados.", ejemplos:"Pruebas con herramientas genéricas sin datos institucionales.", evidencia_sugerida:"Demos aisladas."},
+      {nivel:2, etiqueta:"Básico", cuando_elegir:"Se reconocen precondiciones (datos, calidad, procesos) y hay al menos un caso de uso hipotético priorizado.", ejemplos:"Documento que pospone IA hasta mejorar datos; lista de ideas de casos de uso.", evidencia_sugerida:"Nota de priorización."},
+      {nivel:3, etiqueta:"Intermedio", cuando_elegir:"Casos de uso seleccionados con datos disponibles y criterios de éxito; riesgos identificados.", ejemplos:"Pilot piloto definido (ej. clasificación de documentos) con dataset y métrica.", evidencia_sugerida:"Ficha de caso de uso; dataset identificado."},
+      {nivel:4, etiqueta:"Avanzado", cuando_elegir:"Piloto(s) evaluados, con gobernanza, supervisión humana y medición de resultados.", ejemplos:"Piloto en producción limitada; revisión ética/operativa.", evidencia_sugerida:"Informe de resultados del piloto."},
+      {nivel:5, etiqueta:"Óptimo", cuando_elegir:"Capacidad institucional para incorporar IA de forma responsable, medible y sostenible.", ejemplos:"Portafolio de casos; políticas de uso responsable; mejora continua.", evidencia_sugerida:"Política de IA responsable; portafolio activo."}
+    ]
+  }
 ];
 
-// Navigation
-document.querySelectorAll(".nav-item").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-    btn.classList.add("active");
-    const view = btn.dataset.view;
-    document.getElementById("view-" + view).classList.add("active");
-    document.getElementById("view-title").textContent = btn.textContent;
+const dimensiones = GUIAS.map(g => g.nombre);
+
+function renderDimensionForm() {
+  const form = document.getElementById("dimensiones-form");
+  form.innerHTML = GUIAS.map((g, i) => {
+    const nivelesHTML = g.niveles.map(n => `
+      <div class="nivel-criterio" data-nivel="${n.nivel}">
+        <div class="nivel-criterio-head">
+          <span class="nivel-badge n${n.nivel}">${n.nivel}</span>
+          <strong>${n.etiqueta}</strong>
+        </div>
+        <p><span class="crit-label">Cuándo elegir:</span> ${n.cuando_elegir}</p>
+        <p><span class="crit-label">Ejemplos:</span> ${n.ejemplos}</p>
+        <p><span class="crit-label">Evidencia sugerida:</span> ${n.evidencia_sugerida}</p>
+      </div>
+    `).join("");
+    return `
+    <article class="dim-card" data-dim-index="${i}">
+      <header class="dim-card-head">
+        <span class="dim-num">${i + 1}</span>
+        <div>
+          <h4>${g.nombre}</h4>
+          <p class="dim-pregunta">${g.pregunta_guia}</p>
+        </div>
+      </header>
+      <details class="dim-details" open>
+        <summary>Cómo puntuar esta dimensión (guía para especialistas)</summary>
+        <div class="dim-guide">
+          <p><span class="crit-label">Por qué importa:</span> ${g.por_que_importa}</p>
+          <p><span class="crit-label">Cómo evaluar:</span> ${g.como_evaluar}</p>
+          <div class="niveles-grid">${nivelesHTML}</div>
+        </div>
+      </details>
+      <div class="dim-score-row">
+        <label for="sel-dim-${i}">Puntuación elegida</label>
+        <select id="sel-dim-${i}" data-dim="${g.nombre}" class="dim-select">
+          ${g.niveles.map(n => `<option value="${n.nivel}" ${n.nivel===2?"selected":""}>${n.nivel} – ${n.etiqueta}</option>`).join("")}
+        </select>
+        <p class="dim-score-hint" id="hint-dim-${i}"></p>
+      </div>
+      <label class="dim-evidencia-label" for="ev-dim-${i}">Evidencia / notas del evaluador</label>
+      <textarea id="ev-dim-${i}" class="dim-evidencia" rows="2" placeholder="Cite documentos, sistemas o hechos observados que justifican la puntuación…"></textarea>
+    </article>`;
+  }).join("");
+
+  form.querySelectorAll(".dim-select").forEach(sel => {
+    const updateHint = () => {
+      const card = sel.closest(".dim-card");
+      const idx = parseInt(card.dataset.dimIndex, 10);
+      const nivel = parseInt(sel.value, 10);
+      const c = GUIAS[idx].niveles.find(n => n.nivel === nivel);
+      const hint = card.querySelector(".dim-score-hint");
+      if (c && hint) {
+        hint.innerHTML = `<strong>Por qué este nivel:</strong> ${c.cuando_elegir}`;
+      }
+      card.querySelectorAll(".nivel-criterio").forEach(el => {
+        el.classList.toggle("is-selected", parseInt(el.dataset.nivel, 10) === nivel);
+      });
+    };
+    sel.addEventListener("change", updateHint);
+    updateHint();
   });
-});
+}
 
-// Entity name
-document.getElementById("entity-name").addEventListener("input", e => {
-  state.entityName = e.target.value || "Entidad sin nombre";
-});
+renderDimensionForm();
 
-// Build diagnosis form
-const form = document.getElementById("dimensiones-form");
-dimensiones.forEach((d, i) => {
-  const row = document.createElement("div");
-  row.className = "dim-row";
-  row.innerHTML = `
-    <label>${i + 1}. ${d}</label>
-    <select data-dim="${d}">
-      <option value="0">0 – Inexistente</option>
-      <option value="1">1 – Inicial</option>
-      <option value="2" selected>2 – Básico</option>
-      <option value="3">3 – Intermedio</option>
-      <option value="4">4 – Avanzado</option>
-      <option value="5">5 – Óptimo</option>
-    </select>
-  `;
-  form.appendChild(row);
-});
+
 
 // Evaluate diagnosis
 document.getElementById("btn-evaluar").addEventListener("click", async () => {
   const respuestas = [];
-  document.querySelectorAll("#dimensiones-form select").forEach(sel => {
+  document.querySelectorAll("#dimensiones-form select.dim-select").forEach(sel => {
+    const card = sel.closest(".dim-card");
+    const ev = card ? card.querySelector(".dim-evidencia") : null;
     respuestas.push({
       dimension: sel.dataset.dim,
       nivel: parseInt(sel.value, 10),
-      evidencia: "",
+      evidencia: ev ? ev.value.trim() : "",
       notas: ""
     });
   });
