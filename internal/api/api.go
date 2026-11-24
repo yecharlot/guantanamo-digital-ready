@@ -40,6 +40,27 @@ func (s *Server) routes() {
 	s.Mux.HandleFunc("/", s.handleFrontend)
 }
 
+
+func (s *Server) handleCriterios(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", 405)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]any{
+		"dimensiones": diagnostico.Dimensiones,
+		"guias":       diagnostico.Guias,
+		"leyenda_niveles": []map[string]any{
+			{"nivel": 0, "etiqueta": "Inexistente"},
+			{"nivel": 1, "etiqueta": "Inicial"},
+			{"nivel": 2, "etiqueta": "Básico"},
+			{"nivel": 3, "etiqueta": "Intermedio"},
+			{"nivel": 4, "etiqueta": "Avanzado"},
+			{"nivel": 5, "etiqueta": "Óptimo"},
+		},
+	})
+}
+
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]any{
 		"status":    "ok",
