@@ -224,6 +224,29 @@ function renderDimensionForm() {
 renderDimensionForm();
 
 
+// Navigation
+document.querySelectorAll(".nav-item").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    btn.classList.add("active");
+    const view = btn.dataset.view;
+    const section = document.getElementById("view-" + view);
+    if (section) section.classList.add("active");
+    document.getElementById("view-title").textContent = btn.textContent;
+  });
+});
+
+// Entity name
+const entityInput = document.getElementById("entity-name");
+if (entityInput) {
+  entityInput.addEventListener("input", e => {
+    state.entityName = e.target.value || "Entidad sin nombre";
+  });
+}
+
+
+
 
 // Evaluate diagnosis
 document.getElementById("btn-evaluar").addEventListener("click", async () => {
